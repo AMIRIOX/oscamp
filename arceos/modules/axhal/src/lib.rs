@@ -79,6 +79,9 @@ pub mod mp {
     pub use super::platform::mp::*;
 }
 
+#[cfg(target_arch = "x86_64")]
+pub use self::platform::{boot_info, ModuleEntry};
+
 pub use self::platform::platform_init;
 
 #[cfg(feature = "smp")]

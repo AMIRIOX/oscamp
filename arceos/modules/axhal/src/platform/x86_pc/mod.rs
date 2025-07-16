@@ -32,7 +32,8 @@ fn current_cpu_id() -> usize {
     }
 }
 
-unsafe extern "C" fn rust_entry(magic: usize, _mbi: usize) {
+pub use self::boot::{MultibootInfo, ModuleEntry, set_boot_info, boot_info};
+unsafe extern "C" fn rust_entry(magic: usize, mbi: usize) {
     // TODO: handle multiboot info
     if magic == self::boot::MULTIBOOT_BOOTLOADER_MAGIC {
         crate::mem::clear_bss();
@@ -40,6 +41,9 @@ unsafe extern "C" fn rust_entry(magic: usize, _mbi: usize) {
         self::uart16550::init();
         self::dtables::init_primary();
         self::time::init_early();
+
+        let mbi_info = *(mbi as *const MultibootInfo);
+        self::boot::set_boot_info(mbi_info);
         rust_main(current_cpu_id(), 0);
     }
 }

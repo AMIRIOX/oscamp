@@ -28,7 +28,8 @@ qemu_args-y := -m 128M -smp $(SMP) $(qemu_args-$(ARCH))
 
 ifeq ($(ARCH), x86_64) 
   qemu_args-$(PFLASH) += \
-    -drive if=pflash,file=$(CURDIR)/pflash_x86.img,format=raw,unit=0 \
+    -initrd $(CURDIR)/ramdisk.img \
+	-append "ramdisk_size=33554432"
 #    -drive if=pflash,file=$(CURDIR)/pflash_x86.img,format=raw,unit=1 \
 #    -drive if=pflash,readonly=on,file=$(CURDIR)/dummy_code.img,unit=0
 else ifeq ($(ARCH), aarch64)
