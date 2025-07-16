@@ -26,8 +26,18 @@ qemu_args-aarch64 := \
 
 qemu_args-y := -m 128M -smp $(SMP) $(qemu_args-$(ARCH))
 
-qemu_args-$(PFLASH) += \
+ifeq ($(ARCH), x86_64) 
+  qemu_args-$(PFLASH) += \
+    -drive if=pflash,file=$(CURDIR)/pflash_x86.img,format=raw,unit=0 \
+#    -drive if=pflash,file=$(CURDIR)/pflash_x86.img,format=raw,unit=1 \
+#    -drive if=pflash,readonly=on,file=$(CURDIR)/dummy_code.img,unit=0
+else ifeq ($(ARCH), aarch64)
+  qemu_args-$(PFLASH) += \
+    -drive if=pflash,file=$(CURDIR)/pflash_aarch64.img,format=raw,unit=1
+else 
+  qemu_args-$(PFLASH) += \
   -drive if=pflash,file=$(CURDIR)/$(PFLASH_IMG),format=raw,unit=1
+endif
 
 qemu_args-$(BLK) += \
   -device virtio-blk-$(vdev-suffix),drive=disk0 \

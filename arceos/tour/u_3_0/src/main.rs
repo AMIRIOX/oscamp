@@ -9,7 +9,10 @@ use core::{mem, str};
 use std::os::arceos::modules::axhal::mem::phys_to_virt;
 
 /// Physical address for pflash#1
+#[cfg(target_arch = "riscv64")]
 const PFLASH_START: usize = 0x2200_0000;
+#[cfg(target_arch = "aarch64")]
+const PFLASH_START: usize = 0x0400_0000;
 
 #[cfg_attr(feature = "axstd", no_mangle)]
 fn main() {

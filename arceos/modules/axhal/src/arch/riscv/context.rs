@@ -1,7 +1,7 @@
-use core::arch::asm;
-use memory_addr::VirtAddr;
+use core::arch::naked_asm;
 #[cfg(feature = "uspace")]
 use memory_addr::PhysAddr;
+use memory_addr::VirtAddr;
 
 include_asm_marcos!();
 
@@ -281,9 +281,10 @@ impl UspaceContext {
     }
 }
 
-#[naked]
+#[unsafe(naked)]
 unsafe extern "C" fn context_switch(_current_task: &mut TaskContext, _next_task: &TaskContext) {
-    asm!(
+    naked_asm!(
+        /*
         "
         // save old context (callee-saved registers)
         STR     ra, a0, 0
@@ -318,6 +319,46 @@ unsafe extern "C" fn context_switch(_current_task: &mut TaskContext, _next_task:
         LDR     ra, a1, 0
 
         ret",
-        options(noreturn),
+        */
+
+        // --- Save old context (callee-saved registers) ---
+        // The address of `_current_task` is in a0.
+        // Offsets are index * 8 bytes (for 64-bit registers).
+
+        "sd ra, 0(a0)",
+        "sd sp, 8(a0)",
+        "sd s0, 16(a0)",
+        "sd s1, 24(a0)",
+        "sd s2, 32(a0)",
+        "sd s3, 40(a0)",
+        "sd s4, 48(a0)",
+        "sd s5, 56(a0)",
+        "sd s6, 64(a0)",
+        "sd s7, 72(a0)",
+        "sd s8, 80(a0)",
+        "sd s9, 88(a0)",
+        "sd s10, 96(a0)",
+        "sd s11, 104(a0)",
+
+        // --- Restore new context ---
+        // The address of `_next_task` is in a1.
+        "ld ra, 0(a1)",
+        "ld sp, 8(a1)",
+        "ld s0, 16(a1)",
+        "ld s1, 24(a1)",
+        "ld s2, 32(a1)",
+        "ld s3, 40(a1)",
+        "ld s4, 48(a1)",
+        "ld s5, 56(a1)",
+        "ld s6, 64(a1)",
+        "ld s7, 72(a1)",
+        "ld s8, 80(a1)",
+        "ld s9, 88(a1)",
+        "ld s10, 96(a1)",
+        "ld s11, 104(a1)",
+
+        // Return to the new task's execution flow.
+        // `ret` is a pseudo-instruction for `jalr zero, 0(ra)`.
+        "ret",
     )
 }

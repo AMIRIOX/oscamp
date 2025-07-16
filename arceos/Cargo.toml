@@ -97,3 +97,5 @@ kernel_guard = { path = "../crates/kernel_guard"}
 
 [profile.release]
 lto = true
+
+default = ["paging"]

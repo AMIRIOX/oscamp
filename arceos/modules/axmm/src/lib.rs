@@ -58,6 +58,7 @@ pub fn new_kernel_aspace() -> AxResult<AddrSpace> {
         axconfig::KERNEL_ASPACE_SIZE,
     )?;
     for r in axhal::mem::memory_regions() {
+        info!("[{:?}-{:?}]", r.paddr, r.paddr + r.size );
         aspace.map_linear(phys_to_virt(r.paddr), r.paddr, r.size, r.flags.into())?;
     }
     Ok(aspace)
