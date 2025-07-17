@@ -31,6 +31,9 @@ define mk_pflash
   @dd if=/dev/zero of=./$(1) bs=1M count=32
   @dd if=/tmp/head.bin of=./$(1) conv=notrunc
   @dd if=/tmp/origin.bin of=./$(1) seek=16 obs=1 conv=notrunc
+  @cp ./$(1) ./pflash_aarch64.img
+  @dd if=/dev/zero of=./pflash_aarch64.img bs=1M count=32 seek=32 conv=notrunc
+  @dd if=/dev/zero of=./ramdisk.img bs=1M count=32
 endef
 
 define setup_disk
