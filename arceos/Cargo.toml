@@ -40,6 +40,7 @@ members = [
     "tour/u_7_0",
     "tour/u_8_0",
     "tour/u_9_0",
+    "tour/u_10_0",
     "tour/m_1_0",
     "tour/m_1_1",
     "tour/m_2_0",
@@ -57,7 +58,6 @@ members = [
     "exercises/simple_hv",
     "exercises/ramfs_rename",
 ]
-
 [workspace.package]
 version = "0.1.0"
 authors = ["Yuekai Jia <equation618@gmail.com>"]

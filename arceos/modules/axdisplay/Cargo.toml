@@ -15,3 +15,4 @@ lazyinit = "0.2"
 axdriver = { workspace = true, features = ["display"] }
 axsync = { workspace = true }
 axdriver_display = { git = "https://github.com/arceos-org/axdriver_crates.git", tag = "v0.1.0" }
+axhal = { workspace = true }

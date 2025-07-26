@@ -1,0 +1,20 @@
+[package]
+name = "u_10_0"
+edition = "2021"
+version.workspace = true
+authors.workspace = true
+license.workspace = true
+homepage.workspace = true
+documentation.workspace = true
+repository.workspace = true
+keywords.workspace = true
+categories.workspace = true
+
+[dependencies]
+axstd = { workspace = true, features = ["alloc", "paging", "multitask", "sched_cfs", "display", "irq"], optional = true }
+axdriver_base = { git = "https://github.com/arceos-org/axdriver_crates.git", tag = "v0.1.0" }
+axalloc = { workspace = true }
+axhal = { workspace = true }
+
+[features]
+default = ["axstd"]

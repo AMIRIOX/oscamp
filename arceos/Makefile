@@ -222,6 +222,10 @@ pflash_img:
 	@rm -f $(PFLASH_IMG)
 	$(call mk_pflash,$(PFLASH_IMG))
 
+display:
+	make A=tour/u_10_0 FEATURES=display,bus-mmio,irq GRAPHIC=y
+	qemu-system-riscv64 -machine virt -kernel tour/u_10_0/u_10_0_riscv64-qemu-virt.bin -device virtio-gpu-device,max_outputs=1,max_hostmem=64M -display gtk,gl=on -m 128M -smp 1 -serial mon:stdio
+
 payload:
 	@make -C ./payload
 

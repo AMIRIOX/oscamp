@@ -85,7 +85,9 @@ impl<D: VirtIoDevMeta> DriverProbe for VirtIoDriver<D> {
         {
             if ty == D::DEVICE_TYPE {
                 match D::try_new(transport) {
-                    Ok(dev) => return Some(dev),
+                    Ok(dev) => {
+                        return Some(dev)
+                    },
                     Err(e) => {
                         warn!(
                             "failed to initialize MMIO device at [PA:{:#x}, PA:{:#x}): {:?}",

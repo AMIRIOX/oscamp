@@ -162,7 +162,7 @@ pub fn stdout() -> Stdout {
 }
 
 #[doc(hidden)]
-pub fn __print_impl(args: core::fmt::Arguments) {
+pub unsafe fn __print_impl(args: core::fmt::Arguments) {
     if cfg!(feature = "smp") {
         // synchronize using the lock in axlog, to avoid interleaving
         // with kernel logs

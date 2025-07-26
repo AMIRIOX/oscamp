@@ -235,7 +235,10 @@ pub fn print_fmt(args: fmt::Arguments) -> fmt::Result {
 
 #[doc(hidden)]
 pub fn __print_impl(args: fmt::Arguments) {
-    print_fmt(args).unwrap();
+    // SAFETY: Console printing operations are safe in this kernel context
+    unsafe {
+        print_fmt(args).unwrap();
+    }
 }
 
 /// Initializes the logger.
