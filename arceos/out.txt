@@ -76,8 +76,10 @@ smp = 1
 build_mode = release
 log_level = warn
 
-Framebuffer: 1280x800, base_addr=0xffffffc0807b2000, size=4096000
+Framebuffer: 1280x800, base_addr=0xffffffc080b68000, size=4096000
 Initializing LVGL...
 Registering display driver...
 Display driver registered successfully!
+Created label: 0xffffffc0806c6728
 UI created, starting main loop...
+Flush area: (0, 0) to (1279, 799)

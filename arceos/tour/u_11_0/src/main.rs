@@ -10,9 +10,9 @@ use std::os::arceos::api::display::{ax_framebuffer_flush, ax_framebuffer_info, A
 
 const HOR_RES: u32 = 1280;
 const VER_RES: u32 = 800;
-const DRAW_BUFFER_SIZE: usize = HOR_RES as usize * VER_RES as usize / 10;
+const DRAW_BUFFER_SIZE: usize = HOR_RES as usize * VER_RES as usize;
 
-static mut DRAW_BUFFER: [u16; DRAW_BUFFER_SIZE] = [0; DRAW_BUFFER_SIZE];
+static mut DRAW_BUFFER: [u32; DRAW_BUFFER_SIZE] = [0; DRAW_BUFFER_SIZE];
 static mut FB_INFO: Option<AxDisplayInfo> = None;
 
 #[no_mangle]
@@ -68,8 +68,10 @@ pub extern "C" fn main() -> ! {
                 let x2 = (*area).x2 as u32;
                 let y2 = (*area).y2 as u32;
 
+                println!("Flush area: ({}, {}) to ({}, {})", x1, y1, x2, y2);
+
                 if let Some(fb_info) = &FB_INFO {
-                    let fb_ptr = fb_info.fb_base_vaddr as *mut u16;
+                    let fb_ptr = fb_info.fb_base_vaddr as *mut u32;
 
                     for y in y1..=y2 {
                         for x in x1..=x2 {
@@ -77,13 +79,18 @@ pub extern "C" fn main() -> ! {
                             let dst_idx = y * HOR_RES + x;
 
                             let color = *color_p.add(src_idx as usize);
-                            *fb_ptr.add(dst_idx as usize) = color.full;
+                            let r = ((color.full >> 11) & 0x1F) << 3;
+                            let g = ((color.full >> 5) & 0x3F) << 2;
+                            let b = (color.full & 0x1F) << 3;
+                            let rgba: u32 =
+                                0xFF000000 | ((b as u32) << 16) | ((g as u32) << 8) | (r as u32);
+
+                            *fb_ptr.add(dst_idx as usize) = rgba;
                         }
                     }
                 }
 
                 ax_framebuffer_flush();
-
                 lvgl_sys::lv_disp_flush_ready(disp_drv);
             }
         }
@@ -108,23 +115,23 @@ pub extern "C" fn main() -> ! {
         lvgl_sys::lv_obj_set_style_bg_color(scr, blue_color, 0);
 
         let label = lvgl_sys::lv_label_create(scr);
+        println!("Created label: {:p}", label);
         if !label.is_null() {
-
             let white_color = lvgl_sys::lv_color_t { full: 0xFFFF };
             lvgl_sys::lv_obj_set_style_text_color(label, white_color, 0);
-            
+
             lvgl_sys::lv_obj_set_style_text_font(label, &lvgl_sys::lv_font_montserrat_48, 0);
-            
+
             let text = b"ArceOS + LVGL Demo!\nSuccessfully Running!\0".as_ptr();
             lvgl_sys::lv_label_set_text(label, text);
-            
-            lvgl_sys::lv_obj_set_pos(label, (HOR_RES as i16 / 2) - 120, (VER_RES as i16 / 2) - 30);
+
+            lvgl_sys::lv_obj_set_pos(label, 50, 340);
         }
 
         println!("UI created, starting main loop...");
 
-        lvgl_sys::lv_obj_invalidate(scr);
-        lvgl_sys::lv_refr_now(disp);
+        // lvgl_sys::lv_obj_invalidate(scr);
+        // lvgl_sys::lv_refr_now(disp);
     }
 
     loop {
@@ -136,4 +143,3 @@ pub extern "C" fn main() -> ! {
         std::thread::sleep(Duration::from_millis(5));
     }
 }
-
