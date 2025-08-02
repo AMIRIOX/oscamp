@@ -1,0 +1,8 @@
+[env]
+DEP_LV_CONFIG_PATH = { value = "lvgl_conf", relative = true }
+
+CC_riscv64gc-unknown-none-elf = "riscv64-unknown-elf-gcc"
+AR_riscv64gc-unknown-none-elf = "riscv64-unknown-elf-ar"
+
+CFLAGS_riscv64gc-unknown-none-elf = "-march=rv64gc -mabi=lp64d -I/home/amiriox/opt/riscv64-gnu-toolchain-elf-bin/riscv64-unknown-elf/include  -mcmodel=medany"
+BINDGEN_EXTRA_CLANG_ARGS_riscv64gc-unknown-none-elf = "--target=riscv64 -I/home/amiriox/opt/riscv64-gnu-toolchain-elf-bin/riscv64-unknown-elf/include"

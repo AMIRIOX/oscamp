@@ -1,0 +1,182 @@
+#![cfg_attr(feature = "axstd", no_std)]
+#![cfg_attr(feature = "axstd", no_main)]
+
+#[macro_use]
+#[cfg(feature = "axstd")]
+extern crate axstd as std;
+
+use core::time::Duration;
+use std::os::arceos::api::display::{
+    self, ax_framebuffer_flush, ax_framebuffer_info, AxDisplayInfo,
+};
+use std::os::arceos::modules::axdriver;
+
+use core::mem::MaybeUninit;
+use cstr_core::CString;
+
+use lvgl::style::Style;
+use lvgl::widgets::Label;
+use lvgl::Align;
+use lvgl::Color;
+use lvgl::Display;
+use lvgl::DrawBuffer;
+use lvgl::LvResult;
+use lvgl::NativeObject;
+use lvgl::Part;
+use lvgl::Widget;
+
+use embedded_graphics::pixelcolor::Rgb565;
+use embedded_graphics::prelude::*;
+
+const HOR_RES: u32 = 1280;
+const VER_RES: u32 = 800;
+
+const DRAW_BUFFER_SIZE: usize = (HOR_RES * VER_RES / 10) as usize;
+
+static mut LVGL_BUFFER: MaybeUninit<DrawBuffer<DRAW_BUFFER_SIZE>> = MaybeUninit::uninit();
+static mut SCREEN_STYLE: MaybeUninit<lvgl::style::Style> = MaybeUninit::uninit();
+
+static mut REAL_FRAMEBUFFER: Option<&'static mut [Color]> = None;
+
+#[no_mangle]
+pub extern "C" fn ffs(i: i32) -> i32 {
+    if i == 0 {
+        0
+    } else {
+        (i as u32).trailing_zeros() as i32 + 1
+    }
+}
+
+struct Graphic {
+    // frame_buffer: &'screen_exist mut [Color],
+    display: lvgl::Display,
+    height: u32,
+    width: u32,
+}
+
+extern "C" fn flush_callback(
+    _disp: &mut lvgl::Display,
+    _area: &lvgl::Area,
+    _color_p: *mut u8,
+) -> LvResult<()> {
+    ax_framebuffer_flush();
+    Ok(())
+}
+
+impl Graphic {
+    fn new(fb_info: &AxDisplayInfo) -> Self {
+        //use lvgl::Timer;
+
+        println!("Starting LVGL timer test...");
+
+        // 创建一个每 1000 毫秒执行一次的 LVGL 定时器
+        /*
+        let mut timer = Timer::new(
+            |_| {
+                // 这里的 println! 需要您的 OS 支持
+                println!("LVGL timer ticked!");
+            },
+            1000,
+            None,
+        )
+        .unwrap();
+        timer.resume().unwrap();
+
+        loop {
+            // 驱动 LVGL 心跳
+            lvgl::tick_inc(Duration::from_millis(5));
+            unsafe {
+                lvgl::task_handler();
+            }
+            std::thread::sleep(Duration::from_millis(5));
+        }
+        */
+
+        //panic!("Stop, bitch!");
+        let buffer = unsafe {
+            core::slice::from_raw_parts_mut(
+                fb_info.fb_base_vaddr as *mut Color,
+                fb_info.fb_size / core::mem::size_of::<Color>(),
+            )
+        };
+
+        unsafe {
+            REAL_FRAMEBUFFER = Some(buffer);
+            lvgl::init();
+            LVGL_BUFFER = MaybeUninit::new(DrawBuffer::default());
+        }
+
+        let mut display = lvgl::Display::register(
+            unsafe { LVGL_BUFFER.assume_init_read() },
+            HOR_RES,
+            VER_RES,
+            |refresh| {
+                panic!("heihei");
+                if let Some(framebuffer) = unsafe { REAL_FRAMEBUFFER.as_mut() } {
+                    let area = refresh.area;
+                    let buffer_content = &refresh.colors;
+                    let area_width = area.x2 - area.x1 + 1;
+
+                    for y in area.y1..=area.y2 {
+                        for x in area.x1..=area.x2 {
+                            let i_lvgl = ((y - area.y1) * area_width + (x - area.x1)) as usize;
+                            let i_screen = (y as u32 * fb_info.width + x as u32) as usize;
+                            framebuffer[i_screen] = buffer_content[i_lvgl];
+                        }
+                    }
+                }
+                ax_framebuffer_flush();
+            },
+        )
+        .unwrap();
+
+        Graphic {
+            // frame_buffer: buffer,
+            display,
+            height: fb_info.height,
+            width: fb_info.width,
+        }
+    }
+    fn test(&mut self) {
+        let mut screen = self.display.get_scr_act().unwrap();
+
+        let screen_style = unsafe {
+            SCREEN_STYLE = MaybeUninit::new(Style::default());
+            SCREEN_STYLE.assume_init_mut()
+        };
+
+        screen_style.set_bg_color(Color::from_rgb((255, 255, 255)));
+        screen.add_style(Part::Main, screen_style).unwrap();
+
+        let mut label = Label::create(&mut screen).unwrap();
+        let mut label_style = Style::default();
+        label_style.set_text_color(Color::from_rgb((0, 0, 0))); // 黑色文字
+        label.add_style(Part::Main, &mut label_style).unwrap();
+
+        let text = CString::new("Victory.\nIt is done.").unwrap();
+        label.set_text(&text).unwrap();
+        label.set_align(Align::Center, 0, 0).unwrap();
+
+        unsafe {
+            let screen_ptr = screen.raw().unwrap().as_ptr();
+            lvgl_sys::lv_obj_invalidate(screen_ptr);
+        }
+
+        unsafe {
+            lvgl_sys::lv_refr_now(core::ptr::null_mut());
+        }
+
+        loop {
+            lvgl::tick_inc(Duration::from_millis(5));
+            unsafe { lvgl::task_handler() };
+            std::thread::sleep(core::time::Duration::from_millis(5));
+        }
+    }
+}
+
+#[cfg_attr(feature = "axstd", no_mangle)]
+fn main() {
+    let fb_info = ax_framebuffer_info();
+    let mut screen = Graphic::new(&fb_info);
+    screen.test();
+}

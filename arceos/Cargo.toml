@@ -56,7 +56,7 @@ members = [
     "exercises/alt_alloc",
     "exercises/sys_map",
     "exercises/simple_hv",
-    "exercises/ramfs_rename",
+    "exercises/ramfs_rename", "tour/u_11_0",
 ]
 [workspace.package]
 version = "0.1.0"
