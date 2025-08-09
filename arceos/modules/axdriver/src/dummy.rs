@@ -100,3 +100,34 @@ cfg_if! {
         }
     }
 }
+
+cfg_if! {
+    if #[cfg(all(feature = "input", not(feature = "virtio-input")))] {
+        use axdriver_input::{InputEvent, InputDriverOps};
+
+        pub struct DummyInputDev;
+        pub struct DummyInputDriver;
+        register_input_driver!(DummyInputDriver, DummyInputDev);
+
+        impl BaseDriverOps for DummyInputDev {
+            fn device_type(&self) -> DeviceType {
+                DeviceType::Input
+            }
+            fn device_name(&self) -> &str {
+                "dummy-input"
+            }
+        }
+
+        impl InputDriverOps for DummyInputDev {
+            fn poll_event(&mut self) -> DevResult<InputEvent> {
+                Err(DevError::Again)
+            }
+            fn has_events(&self) -> bool {
+                false
+            }
+            fn device_info(&self) -> &str {
+                "Dummy input device"
+            }
+        }
+    }
+}

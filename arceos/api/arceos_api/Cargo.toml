@@ -21,6 +21,7 @@ multitask = ["axtask/multitask", "axsync/multitask", "axfeat/multitask"]
 fs = ["dep:axfs", "dep:axdriver", "axfeat/fs"]
 net = ["dep:axnet", "dep:axdriver", "axfeat/net"]
 display = ["dep:axdisplay", "dep:axdriver", "axfeat/display"]
+input = ["dep:axinput", "dep:axdriver", "dep:axdriver_input", "axfeat/input"]
 
 myfs = ["axfeat/myfs"]
 
@@ -45,3 +46,5 @@ axdriver = { workspace = true, optional = true }
 axfs = { workspace = true, optional = true }
 axnet = { workspace = true, optional = true }
 axdisplay = { workspace = true, optional = true }
+axinput = { workspace = true, optional = true }
+axdriver_input = { git = "https://github.com/arceos-org/axdriver_crates.git", tag = "v0.1.0", optional = true }

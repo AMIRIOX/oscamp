@@ -1,0 +1,18 @@
+[package]
+name = "axinput"
+version.workspace = true
+edition = "2021"
+authors = ["ArceOS Team"]
+description = "ArceOS input module"
+license.workspace = true
+homepage.workspace = true
+repository = "https://github.com/arceos-org/arceos/tree/main/modules/axinput"
+documentation = "https://arceos-org.github.io/arceos/axinput/index.html"
+
+[dependencies]
+log = "0.4.21"
+lazyinit = "0.2"
+axdriver = { workspace = true, features = ["input"] }
+axsync = { workspace = true }
+axdriver_input = { git = "https://github.com/arceos-org/axdriver_crates.git", tag = "v0.1.0" }
+axhal = { workspace = true }

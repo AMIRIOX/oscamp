@@ -16,6 +16,11 @@ cfg_display! {
     pub use display::*;
 }
 
+cfg_input! {
+    mod input;
+    pub use input::*;
+}
+
 mod stdio {
     use core::fmt;
 

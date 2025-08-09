@@ -153,7 +153,7 @@ pub extern "C" fn rust_main(cpu_id: usize, dtb: usize) -> ! {
     #[cfg(feature = "multitask")]
     axtask::init_scheduler();
 
-    #[cfg(any(feature = "fs", feature = "net", feature = "display"))]
+    #[cfg(any(feature = "fs", feature = "net", feature = "display", feature = "input"))]
     {
         #[allow(unused_variables)]
         let all_devices = axdriver::init_drivers();
@@ -166,6 +166,9 @@ pub extern "C" fn rust_main(cpu_id: usize, dtb: usize) -> ! {
 
         #[cfg(feature = "display")]
         axdisplay::init_display(all_devices.display);
+
+        #[cfg(feature = "input")]
+        axinput::init_input(all_devices.input);
     }
 
     #[cfg(feature = "smp")]

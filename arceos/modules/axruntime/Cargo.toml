@@ -23,6 +23,7 @@ multitask = ["axtask/multitask"]
 fs = ["axdriver", "axfs"]
 net = ["axdriver", "axnet"]
 display = ["axdriver", "axdisplay"]
+input = ["axdriver", "axinput"]
 rtc = []
 
 [dependencies]
@@ -36,6 +37,7 @@ axdriver = { workspace = true, optional = true }
 axfs = { workspace = true, optional = true }
 axnet = { workspace = true, optional = true }
 axdisplay = { workspace = true, optional = true }
+axinput = { workspace = true, optional = true }
 axtask = { workspace = true, optional = true }
 
 crate_interface = "0.1"

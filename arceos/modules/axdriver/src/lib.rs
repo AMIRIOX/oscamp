@@ -7,9 +7,9 @@
 //! (e.g., the network stack) may unpack the struct to get the specified device
 //! driver they want.
 //!
-//! For each device category (i.e., net, block, display, etc.), an unified type
-//! is used to represent all devices in that category. Currently, there are 3
-//! categories: [`AxNetDevice`], [`AxBlockDevice`], and [`AxDisplayDevice`].
+//! For each device category (i.e., net, block, display, input, etc.), an unified type
+//! is used to represent all devices in that category. Currently, there are 4
+//! categories: [`AxNetDevice`], [`AxBlockDevice`], [`AxDisplayDevice`], and [`AxInputDevice`].
 //!
 //! # Concepts
 //!
@@ -34,6 +34,7 @@
 //! | Block | `virtio-blk` | VirtIO block device |
 //! | Network | `virtio-net` | VirtIO network device |
 //! | Display | `virtio-gpu` | VirtIO graphics device |
+//! | Input | `virtio-input` | VirtIO input device (mouse, tablet) |
 //!
 //! # Other Cargo Features
 //!
@@ -42,12 +43,13 @@
 //! - `bus-pci`: use PCI bus to probe all PCI devices. This feature is
 //!    enabeld by default.
 //! - `virtio`: use VirtIO devices. This is enabled if any of `virtio-blk`,
-//!   `virtio-net` or `virtio-gpu` is enabled.
+//!   `virtio-net`, `virtio-gpu`, or `virtio-input` is enabled.
 //! - `net`: use network devices. This is enabled if any feature of network
 //!    devices is selected. If this feature is enabled without any network device
 //!    features, a dummy struct is used for [`AxNetDevice`].
 //! - `block`: use block storage devices. Similar to the `net` feature.
 //! - `display`: use graphics display devices. Similar to the `net` feature.
+//! - `input`: use input devices. Similar to the `net` feature.
 //!
 //! [`VirtioNetDev`]: axdriver_virtio::VirtIoNetDev
 //! [`Box<dyn NetDriverOps>`]: axdriver_net::NetDriverOps
@@ -88,6 +90,8 @@ pub use self::structs::{AxDeviceContainer, AxDeviceEnum};
 pub use self::structs::AxBlockDevice;
 #[cfg(feature = "display")]
 pub use self::structs::AxDisplayDevice;
+#[cfg(feature = "input")]
+pub use self::structs::AxInputDevice;
 #[cfg(feature = "net")]
 pub use self::structs::AxNetDevice;
 
@@ -103,6 +107,9 @@ pub struct AllDevices {
     /// All graphics device drivers.
     #[cfg(feature = "display")]
     pub display: AxDeviceContainer<AxDisplayDevice>,
+    /// All input device drivers.
+    #[cfg(feature = "input")]
+    pub input: AxDeviceContainer<AxInputDevice>,
 }
 
 impl AllDevices {
@@ -143,6 +150,8 @@ impl AllDevices {
             AxDeviceEnum::Block(dev) => self.block.push(dev),
             #[cfg(feature = "display")]
             AxDeviceEnum::Display(dev) => self.display.push(dev),
+            #[cfg(feature = "input")]
+            AxDeviceEnum::Input(dev) => self.input.push(dev),
         }
     }
 }
@@ -177,6 +186,14 @@ pub fn init_drivers() -> AllDevices {
         for (i, dev) in all_devs.display.iter().enumerate() {
             assert_eq!(dev.device_type(), DeviceType::Display);
             debug!("  graphics device {}: {:?}", i, dev.device_name());
+        }
+    }
+    #[cfg(feature = "input")]
+    {
+        debug!("number of input devices: {}", all_devs.input.len());
+        for (i, dev) in all_devs.input.iter().enumerate() {
+            assert_eq!(dev.device_type(), DeviceType::Input);
+            debug!("  input device {}: {:?}", i, dev.device_name());
         }
     }
 

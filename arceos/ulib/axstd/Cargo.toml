@@ -56,6 +56,9 @@ dns = []
 # Display
 display = ["arceos_api/display", "axfeat/display"]
 
+# Input
+input = ["arceos_api/input", "axfeat/input"]
+
 # Real Time Clock (RTC) Driver.
 rtc = ["axfeat/rtc"]
 

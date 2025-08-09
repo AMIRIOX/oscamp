@@ -368,6 +368,35 @@ pub mod display {
     }
 }
 
+/// Input device operations.
+pub mod input {
+    use alloc::string::String;
+    
+    define_api_type! {
+        @cfg "input";
+        pub type InputEvent;
+        pub type InputEventType;
+        pub type MouseEvent;
+        pub type TabletEvent;
+        pub type ProcessedInputEvent;
+        pub type RelativeAxis;
+        pub type AbsoluteAxis;
+        pub type InputDriverOps;
+    }
+
+    define_api! {
+        @cfg "input";
+        /// Poll for input events from the global input devices.
+        pub fn ax_input_poll_event() -> Option<InputEvent>;
+        /// Check if any input events are available without consuming them.
+        pub fn ax_input_has_events() -> bool;
+        /// Get information about the first available input device.
+        pub fn ax_input_device_info() -> Option<String>;
+        /// Get the name of the first available input device.
+        pub fn ax_input_device_name() -> Option<String>;
+    }
+}
+
 /// Input/output operations.
 pub mod io {
     define_api_type! {
@@ -392,7 +421,7 @@ pub mod modules {
     pub use axdisplay;
     #[cfg(feature = "dma")]
     pub use axdma;
-    #[cfg(any(feature = "fs", feature = "net", feature = "display"))]
+    #[cfg(any(feature = "fs", feature = "net", feature = "display", feature = "input"))]
     pub use axdriver;
     #[cfg(feature = "fs")]
     pub use axfs;

@@ -48,6 +48,9 @@ net = ["alloc", "paging", "axdriver/virtio-net", "dep:axnet", "axruntime/net"]
 # Display
 display = ["alloc", "paging", "axdriver/virtio-gpu", "dep:axdisplay", "axruntime/display"]
 
+# Input
+input = ["alloc", "paging", "axdriver/virtio-input", "axruntime/input"]
+
 # Real Time Clock (RTC) Driver.
 rtc = ["axhal/rtc", "axruntime/rtc"]
 

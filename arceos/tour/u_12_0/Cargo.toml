@@ -1,0 +1,26 @@
+[package]
+name = "u_12_0"
+edition = "2021"
+version.workspace = true
+authors.workspace = true
+license.workspace = true
+homepage.workspace = true
+documentation.workspace = true
+repository.workspace = true
+keywords.workspace = true
+categories.workspace = true
+
+[dependencies]
+axstd = { workspace = true, features = ["alloc", "paging", "multitask", "sched_cfs", "display", "input", "irq"], optional = true }
+axdriver_base = { git = "https://github.com/arceos-org/axdriver_crates.git", tag = "v0.1.0" }
+axdriver_input = { git = "https://github.com/arceos-org/axdriver_crates.git", tag = "v0.1.0" }
+axalloc = { workspace = true }
+axhal = { workspace = true }
+# lvgl = { version = "0.6.2", default-features = false, features = ["unsafe_no_autoinit", "embedded_graphics"]}
+# cstr_core = "0.2.6"
+# lvgl-sys = "0.6.2"
+# embedded-graphics = "0.7.1"
+
+[features]
+default = ["axstd", "display"]
+display = ["axstd/display"]

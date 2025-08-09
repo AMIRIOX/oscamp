@@ -23,5 +23,5 @@ embedded-graphics = "0.7.1"
 [features]
 default = ["axstd"]
 
-[patch.crates-io]
-lvgl-sys = { path = "../../libs/lvgl-sys" } 
+#[patch.crates-io]
+#lvgl-sys = { path = "../../libs/lvgl-sys" } 

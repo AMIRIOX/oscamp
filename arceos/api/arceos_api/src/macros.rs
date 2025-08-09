@@ -105,6 +105,10 @@ macro_rules! cfg_display {
     ($($item:item)*) => { _cfg_common!{ "display" $($item)* } }
 }
 
+macro_rules! cfg_input {
+    ($($item:item)*) => { _cfg_common!{ "input" $($item)* } }
+}
+
 macro_rules! cfg_task {
     ($($item:item)*) => { _cfg_common!{ "multitask" $($item)* } }
 }

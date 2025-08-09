@@ -12,6 +12,9 @@ pub type AxBlockDevice = Box<dyn BlockDriverOps>;
 /// The unified type of the graphics display devices.
 #[cfg(feature = "display")]
 pub type AxDisplayDevice = Box<dyn DisplayDriverOps>;
+/// The unified type of the input devices.
+#[cfg(feature = "input")]
+pub type AxInputDevice = Box<dyn InputDriverOps>;
 
 impl super::AxDeviceEnum {
     /// Constructs a network device.
@@ -30,6 +33,12 @@ impl super::AxDeviceEnum {
     #[cfg(feature = "display")]
     pub fn from_display(dev: impl DisplayDriverOps + 'static) -> Self {
         Self::Display(Box::new(dev))
+    }
+    
+    /// Constructs an input device.
+    #[cfg(feature = "input")]
+    pub fn from_input(dev: impl InputDriverOps + 'static) -> Self {
+        Self::Input(Box::new(dev))
     }
 }
 

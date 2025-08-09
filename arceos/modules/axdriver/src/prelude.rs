@@ -6,5 +6,7 @@ pub use axdriver_base::{BaseDriverOps, DevError, DevResult, DeviceType};
 pub use {crate::structs::AxBlockDevice, axdriver_block::BlockDriverOps};
 #[cfg(feature = "display")]
 pub use {crate::structs::AxDisplayDevice, axdriver_display::DisplayDriverOps};
+#[cfg(feature = "input")]
+pub use {crate::structs::AxInputDevice, axdriver_input::InputDriverOps};
 #[cfg(feature = "net")]
 pub use {crate::structs::AxNetDevice, axdriver_net::NetDriverOps};
